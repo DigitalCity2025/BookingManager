@@ -12,7 +12,7 @@ namespace BookingManager.DAL.Configurations
 
             builder.Property(b => b.ImageUrl)
                 .HasColumnName("image")
-                .HasColumnType("varchar(max)");
+                .HasColumnType("varchar(50)");
 
             builder.HasIndex(b => b.ImageUrl).IsUnique();
 
