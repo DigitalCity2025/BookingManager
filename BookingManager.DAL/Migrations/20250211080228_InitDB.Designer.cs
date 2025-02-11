@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingManager.DAL.Migrations
 {
     [DbContext(typeof(HotelContext))]
-    [Migration("20250210085235_InitDB")]
+    [Migration("20250211080228_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -122,7 +122,7 @@ namespace BookingManager.DAL.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("varchar(max)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("image");
 
                     b.Property<int>("MaxCapacity")
@@ -140,22 +140,25 @@ namespace BookingManager.DAL.Migrations
 
                     b.HasKey("RoomId");
 
+                    b.HasIndex("ImageUrl")
+                        .IsUnique();
+
                     b.ToTable("Room", (string)null);
                 });
 
-            modelBuilder.Entity("OptionRoom", b =>
+            modelBuilder.Entity("RoomOption", b =>
                 {
-                    b.Property<int>("OptionsOptionId")
+                    b.Property<int>("OptionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomsRoomId")
+                    b.Property<int>("RoomId")
                         .HasColumnType("int");
 
-                    b.HasKey("OptionsOptionId", "RoomsRoomId");
+                    b.HasKey("OptionId", "RoomId");
 
-                    b.HasIndex("RoomsRoomId");
+                    b.HasIndex("RoomId");
 
-                    b.ToTable("OptionRoom");
+                    b.ToTable("RoomOption");
                 });
 
             modelBuilder.Entity("BookingManager.DAL.Entities.Customer", b =>
@@ -203,17 +206,17 @@ namespace BookingManager.DAL.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("OptionRoom", b =>
+            modelBuilder.Entity("RoomOption", b =>
                 {
                     b.HasOne("BookingManager.DAL.Entities.Option", null)
                         .WithMany()
-                        .HasForeignKey("OptionsOptionId")
+                        .HasForeignKey("OptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BookingManager.DAL.Entities.Room", null)
                         .WithMany()
-                        .HasForeignKey("RoomsRoomId")
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

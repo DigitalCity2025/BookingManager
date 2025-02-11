@@ -19,21 +19,21 @@ namespace BookingManager.DAL.Configurations
             // configuration de la table intermédiaire
             builder.HasMany(r => r.Options)
                 .WithMany(o => o.Rooms)
-                //.UsingEntity(
-                //    "RoomOption",
-                //    l => l.HasOne(typeof(Room)).WithMany().HasForeignKey("RoomId")
-                //        .HasPrincipalKey(nameof(Room.RoomId)),
-                //    r => r.HasOne(typeof(Option)).WithMany().HasForeignKey("OptionId")
-                //        .HasPrincipalKey(nameof(Option.OptionId))
-                //);
-                //.UsingEntity(
-                //    "RoomOption",
-                //    j => {
-                //        j.Property("RoomId").HasColumnName("RoomId");
-                //        j.Property("OptionId").HasColumnName("OptionId");
-                //    }
-                //);
-                ;
+                .UsingEntity(
+                    "RoomOption",
+                    l => l.HasOne(typeof(Option)).WithMany().HasForeignKey("OptionId")
+                        .HasPrincipalKey(nameof(Option.OptionId)),
+                    r => r.HasOne(typeof(Room)).WithMany().HasForeignKey("RoomId")
+                        .HasPrincipalKey(nameof(Room.RoomId))
+                );
+            //.UsingEntity(
+            //    "RoomOption",
+            //    j => {
+            //        j.Property("RoomId").HasColumnName("RoomId");
+            //        j.Property("OptionId").HasColumnName("OptionId");
+            //    }
+            //);
+            ;
         }
     }
 }

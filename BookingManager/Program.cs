@@ -4,134 +4,163 @@ using Microsoft.EntityFrameworkCore;
 
 using HotelContext ctx = new HotelContext();
 
-// récupérer des données
-// SELECT * FROM Room
-List<Room> result = ctx.Rooms.ToList();
+/*
+ * -3. Afficher toutes les réservations faites en 2024.
+-2. Afficher toutes les personnes dont le nom commence par D.
+-1 Afficher toutes chambres du 1 étage. 
+1. Trouver tous les clients (nom et prénom) qui ont réservé une chambre au mois de juin 2024.
+2. Afficher le numéro et le prix de toutes les chambres avec l'option "Wifi gratuit".
+3. Combien de réservations ont été faites en mars 2024 ?
+4. Trouver les noms et prénoms des clients qui ont réservé la chambre la plus chère.
+5. Afficher les noms des options qui sont disponibles dans au moins deux chambres.
+6. Calculer le revenu total généré par chaque chambre en 2024 (somme des prix des réservations).
+ 
+Afficher les chambres et leur options
+ */
 
-// SELECT * FROM Room WHERE Surface > 100
-result = ctx.Rooms.Where(r => r.Surface > 100).ToList();
+#region Exo -3
+//List<Booking> result1 = ctx.Bookings
+//    .Where(b => b.BookingDate.Year == 2024)
+//    .ToList();
 
-// SELECT * FROM Room WHERE Id = 42
-Room? room = ctx.Rooms.Find(42);
+List<Booking> result1 = (from c in ctx.Bookings
+                        where c.BookingDate.Year == 2024
+                        select c).ToList();
 
-// SELECT * FROM example WHERE ID1 = 45 AND ID2 = 73
-// var ex = ctx.Examples.Find(45, 73) 
+Console.WriteLine("----- Exercice -3 ------");
+foreach (Booking b in result1)
+{
+    Console.WriteLine($"{b.StartDate} {b.EndDate} {b.CustomerId} {b.RoomId}");
+}
+#endregion
 
-// SELECT * FROM Customer WHERE email LIKE 'lykhun@gmail.com'
-Customer? user = ctx.Customers.SingleOrDefault(c => c.Email == "lykhun@gmail.com");
-Customer? user2 = ctx.Customers.SingleOrDefault(c => EF.Functions.Like(c.Email, "lykhun@gmail.com"));
+#region Exo -2
+//List<Customer> result2 = ctx.Customers
+//    .Where(c => c.LastName.StartsWith("d"))
+//    .ToList();
+List<Customer> result2 = ctx.Customers
+    .Where(c => EF.Functions.Like(c.LastName, "d%"))
+    .ToList();
+Console.WriteLine("----- Exercice -2 ------");
+foreach (Customer c in result2)
+{
+    Console.WriteLine($"{c.LastName} {c.FirstName}");
+}
+#endregion
 
-// SELECT TOP 1 * FROM Customer WHERE lastName LIKE 'a%'
-Customer? user3 = ctx.Customers.FirstOrDefault(c => c.LastName.StartsWith("a"));
-Customer? user4 = ctx.Customers.FirstOrDefault(c => EF.Functions.Like(c.LastName, "a%"));
+#region Exo -1
+var result3 = ctx.Rooms.Where(r => r.Floor == 1).ToList();
+Console.WriteLine("----- Exercice -1 -----");
+foreach (Room r in result3)
+{
+    Console.WriteLine($"{r.Number} {r.Floor}");
+}
+#endregion
 
-// PASSER 10 LIGNES et récupérer les 10 suivantes
-// SELECT * FROM Customer
-// ORDER BY LastName
-// OFFSET 10 ROWS FECTH 10 ROWS ONLY
-List<Customer> results2 = ctx.Customers
-    .OrderBy(c => c.LastName)
-    .Skip(10).Take(10).ToList();
+#region Exo 1
+// bool reservationJuin2024 = ctx.Bookings
+//    .Any(b => b.BookingDate.Year == 2024 && b.BookingDate.Month == 6);
+// Console.WriteLine(reservationJuin2024);
 
-// SELECT COUNT(*) FROM Customer
-int count = ctx.Customers.Count();
+//List<Customer> result4 = ctx.Customers
+//    .Where(c => c.Bookings
+//        .Any(b => b.BookingDate.Year == 2024 && b.BookingDate.Month == 6))
+//    .ToList();
 
-// SELECT AVG(price) FROM Room
-// decimal moyenne = ctx.Rooms.Average(r => r.Price);
+List<Customer> result4 = ctx.Bookings
+    .Include(b => b.Customer)
+    .Where(b => b.BookingDate.Year == 2024 && b.BookingDate.Month == 6)
+    .GroupBy(b => b.Customer)
+    .Select(g => g.Key)
+    .ToList();
+foreach(Customer c in result4)
+{
+    Console.WriteLine($"{c.LastName} {c.FirstName}");
+}
+#endregion
 
-// SELECT c.*, b.*, r.*
-// FROM Customer c
-// LEFT Booking b ON b.CutomerId = c.CustomerId
-// LEFT JOIN r ON b.RoomId = r.RoomId
-List<Customer> result3 = ctx.Customers
-    .Include(c => c.Bookings).ThenInclude(b => b.Room).ToList();
+#region Exo 2
+List<Room> result5 = ctx.Rooms
+    .Include(r => r.Options)
+    .Where(r => r.Options.Any(o => o.Name == "Wifi gratuit")).ToList();
+Console.WriteLine("----- Exercice 2 -----");
+foreach (Room r in result5)
+{
+    Console.WriteLine(
+        $"{r.Number} {r.Price} {string.Join(",", r.Options.Select(o => o.Name))}€"
+    );
+}
+#endregion
 
-// DML Insert, Update, Delete
+#region Exo 3
+//int result6 = ctx.Bookings
+//    .Where(b => b.BookingDate.Year == 2024 && b.BookingDate.Month == 3)
+//    .Count();
+int result6 = ctx.Bookings
+    .Count(b => b.BookingDate.Year == 2024 && b.BookingDate.Month == 3);
+Console.WriteLine("----- Exercice 3 ------");
+Console.WriteLine(result6);
+#endregion
 
-// INSERT INTO Customer
-// (LastName, FirstName, Email, Password, PhoneNumber, UserName)
-// VALUES
-// ('LY', 'Khun', 'lykhun@gmail.com', [], null, 'K')
-//Customer customer = new Customer { 
-//    LastName = "Ly",
-//    FirstName = "Khun",
-//    Email = "lykhun@gmail.com",
-//    Password = new byte[0],
-//    PhoneNumber = null,
-//    Username = "K",
-//};
-//ctx.Customers.Add(customer);
-//ctx.SaveChanges();
+#region Exo 4
+Room mostExpensiveRoom = ctx.Rooms.OrderByDescending(r => r.Price).First();
+var result7 = ctx.Customers
+    .Where(c => c.Bookings.Any(b => b.RoomId == mostExpensiveRoom.RoomId)).ToList();
 
+foreach(Customer c in result7)
+{
+    Console.WriteLine($"{c.LastName} {c.FirstName}");
+}
+#endregion
 
-//Booking b = new Booking
-//{
-//    BookingDate = DateTime.Now,
-//    StartDate = DateTime.Now,
-//    EndDate = DateTime.Now.AddDays(42),
-//    Status = BookingManager.DAL.Enums.BookingStatus.InProgress,
-//    // dans le cas ou on souhaite créer le customer en meme tant que la réservation
-//    // Customer = new Customer { /*LastName = "Ly", ...*/ }
-//    // dans le cas ou on souhaite utiliser un customer existant
-//    CustomerId = 1,
-//    RoomId = 42
-//};
-
-//ctx.Bookings.Add(b);
-//ctx.SaveChanges();
-
-//List<Option> options = [
-//    new Option
-//    {
-//        Name = "Vue sur Mer"
-//    },
-//    new Option{  Name = "Suite" },
-//    new Option{  Name = "Air conditionné" },
-//    new Option{  Name = "Mini Bar" },
-//    new Option{  Name = "Jaccuzzi" },
-//    new Option{  Name = "Casino" },
-//];
-//// insersions multiple
-//ctx.Options.AddRange(options);
-
-
-//Room r = new Room
-//{
-//    Floor = 42,
-//    ImageUrl = "",
-//    MaxCapacity = 2,
-//    Number = "42A",
-//    Price = 42,
-//    Surface = 42,
-//    // ajoute dans la table entre option et room
-//    Options = [options[0], options[2], options[4]]
-//};
-//ctx.Rooms.Add(r);
-//ctx.SaveChanges();
-
-// modification
-// UPDATE Customer SET LastName = 'Lee' WHERE CustomerId = 1
-//Customer? c = ctx.Customers.Find(1);
-//c.LastName = "Lee";
-//ctx.SaveChanges();
-
-// suppression
-// DELETE FROM Customer WHERE Id = 1
-//Customer? c = ctx.Customers.Find(1);
-//if(c != null) ctx.Remove(c);
-//ctx.SaveChanges();
-
-// SELECT floor AS FLOOR, AVG(price) AS Moyenne FROM Room GROUP BY floor
-var moyennes = ctx.Rooms.GroupBy(r => r.Floor)
-    .ToList()
-    .Select(g => new
+#region Exo 5
+List<Option> result8 = ctx.Options
+    .Include(o => o.Rooms) // facultatif
+    .Where(o => o.Rooms.Count() >= 2).ToList();
+Console.WriteLine("----- Exercice 5 -----");
+foreach (Option o in result8)
+{
+    Console.WriteLine(o.Name);
+    foreach (Room r in o.Rooms)
     {
-        Floor = g.Key,
-        Moyenne = g.Average(r => r.Price)
+        Console.WriteLine(r.Number);
+    }
+    Console.WriteLine("---------------------");
+}
+#endregion
+
+#region Exo 6
+var result9 = ctx.Bookings
+    .Where(b => b.BookingDate.Year == 2024)
+    .GroupBy(b => b.Room)
+    .Select(g => new { 
+        Number = g.Key.Number, 
+        Total = g.Sum(r => r.Price - (r.Price * (r.Discount / 100))) ,
+        // Total = g.Sum(r => r.Price * (1 - r.Discount/100))
+    })
+    .ToList();
+List<NumberTotal> result10 = ctx.Rooms
+    .Select(r => new NumberTotal
+    {
+        Number = r.Number,
+        Total = r.Bookings
+            .Where(b => b.BookingDate.Year == 2024)
+            .Sum(b => b.Price - (1 * b.Discount / 100))
     }).ToList();
 
-foreach (var m in moyennes)
+foreach (var item in result9)
 {
-    Console.WriteLine(m.Floor);
-    Console.WriteLine(m.Moyenne);
+    Console.WriteLine(item.Number);
+    Console.WriteLine(item.Total);
+    Console.WriteLine("-------------------------------");
+}
+
+
+#endregion
+
+
+class NumberTotal
+{
+    public string Number { get; set; } = null!;
+    public decimal Total { get; set; }
 }
