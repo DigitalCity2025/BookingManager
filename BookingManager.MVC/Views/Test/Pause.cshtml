@@ -1,0 +1,26 @@
+﻿@{
+    // écrire du code C#
+    Layout = "_Layout2";
+    int value = 42;
+}
+
+@* <p>Hello world !!</p> *@
+
+@*commentaire : Afficher une variable*@
+@* <p>Ma variable = @value ou @(value * 2)</p> *@
+@if(value < 100) {
+    @* <p>La variable est plus petite que 100</p> *@
+} else {
+    @* <p>Autre chose ...</p> *@
+}
+@* <ul>
+    @for(int i = 0; i < value; i++) {
+        <li>@i</li>
+    }
+</ul> *@
+
+@if(Model >= 0) {
+    <p>Le nombre de minutes avant 10h est @Model minutes</p>
+} else {
+    <p>C'est l'heure de la pause</p>
+}
