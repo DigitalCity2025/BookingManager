@@ -47,7 +47,7 @@ namespace BookingManager.DAL.Migrations
                     Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Floor = table.Column<int>(type: "int", nullable: false),
                     Surface = table.Column<int>(type: "int", nullable: false),
-                    image = table.Column<string>(type: "varchar(max)", nullable: false),
+                    image = table.Column<string>(type: "varchar(50)", nullable: false),
                     MaxCapacity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
@@ -78,24 +78,24 @@ namespace BookingManager.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OptionRoom",
+                name: "RoomOption",
                 columns: table => new
                 {
-                    OptionsOptionId = table.Column<int>(type: "int", nullable: false),
-                    RoomsRoomId = table.Column<int>(type: "int", nullable: false)
+                    OptionId = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OptionRoom", x => new { x.OptionsOptionId, x.RoomsRoomId });
+                    table.PrimaryKey("PK_RoomOption", x => new { x.OptionId, x.RoomId });
                     table.ForeignKey(
-                        name: "FK_OptionRoom_Option_OptionsOptionId",
-                        column: x => x.OptionsOptionId,
+                        name: "FK_RoomOption_Option_OptionId",
+                        column: x => x.OptionId,
                         principalTable: "Option",
                         principalColumn: "OptionId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OptionRoom_Room_RoomsRoomId",
-                        column: x => x.RoomsRoomId,
+                        name: "FK_RoomOption_Room_RoomId",
+                        column: x => x.RoomId,
                         principalTable: "Room",
                         principalColumn: "RoomId",
                         onDelete: ReferentialAction.Cascade);
@@ -157,9 +157,15 @@ namespace BookingManager.DAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_OptionRoom_RoomsRoomId",
-                table: "OptionRoom",
-                column: "RoomsRoomId");
+                name: "IX_Room_image",
+                table: "Room",
+                column: "image",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomOption_RoomId",
+                table: "RoomOption",
+                column: "RoomId");
         }
 
         /// <inheritdoc />
@@ -169,7 +175,7 @@ namespace BookingManager.DAL.Migrations
                 name: "Booking");
 
             migrationBuilder.DropTable(
-                name: "OptionRoom");
+                name: "RoomOption");
 
             migrationBuilder.DropTable(
                 name: "Customer");
