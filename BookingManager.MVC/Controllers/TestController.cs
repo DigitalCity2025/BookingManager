@@ -1,8 +1,5 @@
 ﻿using BookingManager.MVC.Models;
-using Humanizer;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using System.Net.Mail;
 
 namespace BookingManager.MVC.Controllers
@@ -48,7 +45,9 @@ namespace BookingManager.MVC.Controllers
                 MailMessage message = new();
                 message.Subject = form.Sujet;
                 message.Body = form.Message;
-                message.From = new MailAddress("test@khunly.be");
+                message.From = new MailAddress(
+                    "test@khunly.be", "Administration Booking"
+                );
                 message.To.Add(new MailAddress("lykhun@gmail.com"));
                 smtpClient.Send(message);
 
