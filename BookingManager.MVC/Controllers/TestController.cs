@@ -1,10 +1,20 @@
 ﻿using BookingManager.MVC.Models;
+using Humanizer;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Mail;
 
 namespace BookingManager.MVC.Controllers
 {
-    public class TestController : Controller
+    public class TestController(SmtpClient smtpClient, A instanceA, B instanceB) : Controller
     {
+        //private readonly SmtpClient smtpClient;
+        //public TestController(SmtpClient client)
+        //{
+        //    smtpClient = client;
+        //}
+
         public string Hello([FromQuery] string nom)
         {
             return $"Hello {nom} !!";
@@ -27,12 +37,20 @@ namespace BookingManager.MVC.Controllers
 
         // méthode pour traiter le formulaire
         [HttpPost]
-        public IActionResult Contact([FromForm] ContactFormViewModel form)
+        public IActionResult Contact(
+            [FromForm] ContactFormViewModel form
+        )
         {
             if(ModelState.IsValid)
             {
                 // faire un traitement pour envoyer un email
-
+                
+                MailMessage message = new();
+                message.Subject = form.Sujet;
+                message.Body = form.Message;
+                message.From = new MailAddress("test@khunly.be");
+                message.To.Add(new MailAddress("lykhun@gmail.com"));
+                smtpClient.Send(message);
 
                 // redirection
                 return RedirectToAction("Index", "Home");
