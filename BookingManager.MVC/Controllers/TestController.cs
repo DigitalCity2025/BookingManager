@@ -7,7 +7,7 @@ using System.Net.Mail;
 
 namespace BookingManager.MVC.Controllers
 {
-    public class TestController(SmtpClient smtpClient, A instanceA, B instanceB) : Controller
+    public class TestController(SmtpClient smtpClient) : Controller
     {
         //private readonly SmtpClient smtpClient;
         //public TestController(SmtpClient client)

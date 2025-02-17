@@ -1,23 +1,10 @@
-using BookingManager.MVC;
-using System.Net;
-using System.Net.Mail;
+using BookingManager.MVC.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-builder.Services.AddScoped(b => new SmtpClient
-{
-    Host = "K-LAPTOP",
-    Port = 25,
-    Credentials = new NetworkCredential
-    {
-        UserName = "khun",
-        Password = "1234"
-    },
-    EnableSsl = false
-});
+builder.Services.AddSmtp(builder.Configuration);
 
 var app = builder.Build();
 
