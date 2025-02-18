@@ -10,17 +10,23 @@ namespace BookingManager.MVC
             throw new NotImplementedException();
         }
 
+        public List<Customer> FindByKeyword(string? keyword)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Customer> GetAll()
         {
-            return new List<Customer>
-            {
-                new Customer { LoginId  = 42,
-                LastName = "Foo",
-                FirstName = "Bar",
-                Email = "Bar",
-                Bookings = []
+            return
+            [
+                new Customer { 
+                    LoginId  = 42,
+                    LastName = "Foo",
+                    FirstName = "Bar",
+                    Email = "Bar",
+                    Bookings = []
                 }
-            };
+            ];
         }
 
         public Customer? GetByEmail(string email)

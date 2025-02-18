@@ -10,13 +10,14 @@ namespace BookingManager.MVC.Controllers
 {
     public class CustomerController(ICustomerRepository repository) : Controller
     {
-        public IActionResult Index()
+        public IActionResult Index([FromQuery]CustomerSearchFormViewModel model)
         {
-            //List<Customer> clients = repository.GetAll();
-            //List<CustomerIndexViewModel> model = clients
-            //    // mapper chaque Customer en CustomerIndexViewModel
-            //    .Select(ToViewModelMappers.ToCustomerIndex).ToList();
-            return View(repository.GetAll().Select(ToViewModelMappers.ToCustomerIndex));
+            if(ModelState.IsValid)
+            {
+                model.Results = repository.FindByKeyword(model.Search)
+                    .Select(ToViewModelMappers.ToCustomerIndex).ToList();
+            }
+            return View(model);
         }
     }
 }

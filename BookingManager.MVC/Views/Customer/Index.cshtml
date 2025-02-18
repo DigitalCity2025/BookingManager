@@ -1,37 +1,43 @@
-﻿@model IEnumerable<BookingManager.MVC.Models.CustomerIndexViewModel>
+﻿@model CustomerSearchFormViewModel
 
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<div>
+    <form method="get">
+        <div class="form-group">
+            <input class="form-control" asp-for="Search" placeholder="rechercher par nom, prenom ou email"/>
+            <span class="text-danger" asp-validation-for="Search"></span>
+        </div>
+        <button class="btn btn-outline-secondary mt-3">Rechercher</button>
+    </form>
+</div>
+@if(Model.Results.Count > 0) {
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                @Html.DisplayNameFor(model => model.Results.First().Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.Results.First().LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                    @Html.DisplayNameFor(model => model.Results.First().FirstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                    @Html.DisplayNameFor(model => model.Results.First().Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BookingsNb)
+                    @Html.DisplayNameFor(model => model.Results.First().BookingsNb)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Results) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Id)
@@ -57,3 +63,4 @@
 }
     </tbody>
 </table>
+}
