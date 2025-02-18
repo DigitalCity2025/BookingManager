@@ -7,7 +7,8 @@
         ("Test", "Pause", "Heure de la pause", 15),
         ("Test", "Contact", "Contactez nous", null),
         ("Customer", "Index", "Voir les clients", null)
-    ]; 
+    ];
+    RouteData route = Context.GetRouteData();
 }
 
 <header>
@@ -21,13 +22,23 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     @foreach(var item in menuItems) {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" 
-                                asp-controller="@item.controller" 
-                                asp-action="@item.action"
-                                asp-route-id="@item.id"
-                            >@item.text</a>
-                        </li>
+                        if(route.Values["Controller"] == item.controller && route.Values["Action"] == item.action) {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark active"
+                                   asp-controller="@item.controller"
+                                   asp-action="@item.action"
+                                   asp-route-id="@item.id">@item.text</a>
+                            </li>
+                        }
+                        else {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" 
+                                    asp-controller="@item.controller" 
+                                    asp-action="@item.action"
+                                    asp-route-id="@item.id"
+                                >@item.text</a>
+                            </li>
+                        }
                     }
                 </ul>
             </div>

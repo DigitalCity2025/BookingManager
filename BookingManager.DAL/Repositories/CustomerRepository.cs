@@ -40,5 +40,11 @@ namespace BookingManager.DAL.Repositories
             return ctx.Customers
                 .Where(c => c.Bookings.Any(b => b.BookingDate.Year == year)).ToList();
         }
+
+        public int CountByUsername(string prefix)
+        {
+            using HotelContext ctx = new HotelContext();
+            return ctx.Customers.Count(c => c.Username.StartsWith(prefix));
+        }
     }
 }
