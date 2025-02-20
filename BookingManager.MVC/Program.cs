@@ -1,8 +1,8 @@
-using BookingManager.Application.Abstractions;
+using BookingManager.Application.Abstractions.Business;
+using BookingManager.Application.Abstractions.Repositories;
+using BookingManager.Application.Services;
 using BookingManager.DAL.Repositories;
-using BookingManager.MVC;
 using BookingManager.MVC.Configurations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSmtp(builder.Configuration);
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 //builder.Services.AddScoped<ICustomerRepository, FakeCustomerRepository>();
+
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 

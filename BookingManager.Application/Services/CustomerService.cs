@@ -1,5 +1,8 @@
-﻿using BookingManager.Application.Abstractions;
+﻿using BookingManager.Application.Abstractions.Business;
+using BookingManager.Application.Abstractions.Repositories;
+using BookingManager.Application.Exceptions;
 using BookingManager.DAL.Entities;
+using System.Data;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,10 +13,17 @@ namespace BookingManager.Application.Services
     public class CustomerService(
         ICustomerRepository repository, 
         SmtpClient smtpClient
-    )
+    ) : ICustomerService
     {
-        public Customer Create(in Customer c) 
+        public Customer Create(Customer c) 
         {
+            // verifier que l'email est unique
+            Customer? cu = repository.GetByEmail(c.Email);
+            if (cu != null)
+            {
+                throw new DuplicateFieldException("Email", "Cet email existe dejà");
+            }
+
             // créer un username
             c.Username = CreateUsername(c);
             // créer un password
@@ -57,5 +67,6 @@ namespace BookingManager.Application.Services
             mail.To.Add(new MailAddress(c.Email));
             smtpClient.Send(mail);
         }
+
     }
 }

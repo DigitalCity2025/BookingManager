@@ -1,4 +1,4 @@
-﻿using BookingManager.Application.Abstractions;
+﻿using BookingManager.Application.Abstractions.Repositories;
 using BookingManager.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 

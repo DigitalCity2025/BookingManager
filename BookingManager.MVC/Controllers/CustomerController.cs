@@ -1,4 +1,6 @@
-﻿using BookingManager.Application.Abstractions;
+﻿using BookingManager.Application.Abstractions.Business;
+using BookingManager.Application.Abstractions.Repositories;
+using BookingManager.Application.Exceptions;
 using BookingManager.DAL.Entities;
 using BookingManager.DAL.Repositories;
 using BookingManager.MVC.Mappers;
@@ -12,7 +14,7 @@ using System.Transactions;
 
 namespace BookingManager.MVC.Controllers
 {
-    public class CustomerController(ICustomerRepository repository, SmtpClient smtpClient) : Controller
+    public class CustomerController(ICustomerRepository repository, ICustomerService customerService) : Controller
     {
         public IActionResult Index([FromQuery]CustomerSearchFormViewModel model)
         {
@@ -33,42 +35,36 @@ namespace BookingManager.MVC.Controllers
         public IActionResult Create(CustomerCreateFormViewModel form) 
         {
             // verifier si le formulaire est invalide
+            if (!ModelState.IsValid)
+            {
+                // revenir sur le formulaire
+                return View();
+            }
+            // mapper les données dans une entité
+            Customer c = new Customer
+            {
+                LastName = form.LastName,
+                FirstName = form.FirstName,
+                Email = form.Email,
+                PhoneNumber = form.PhoneNumber,
+            };
             try
             {
-                if (!ModelState.IsValid)
-                // oui 
-                {
-                    // revenir sur le formulaire
-                    return View(form);
-                }
-                // verifier que l'email est unique
-                Customer? cu = repository.GetByEmail(form.Email);
-                if (cu != null)
-                {
-                    ModelState.AddModelError(nameof(form.Email), "L'email existe déjà");
-                    return View(form);
-                }
-
-
-                // non
-                // traiter les données
-                // mapper les données dans une entité
-                Customer c = new Customer
-                {
-                    LastName = form.LastName,
-                    FirstName = form.FirstName,
-                    Email = form.Email,
-                    PhoneNumber = form.PhoneNumber,
-                };
-                
-                TempData["success"] = "Enreistrement OK";
-                return RedirectToAction("Index");
+                customerService.Create(c);
             }
-            catch (Exception ex)
+            catch(DuplicateFieldException ex)
             {
-                TempData["error"] = ex.Message;
-                return View(form);
+                ModelState.AddModelError(ex.FieldName, ex.Message);
+                return View();
             }
+            catch(SmtpException)
+            {
+                TempData["error"] = "L'email n'a pas pu être envoyé";
+                return View();
+            }
+            TempData["success"] = "Enregistrement OK";
+            return RedirectToAction("Index");
+            
         }
     }
 }
