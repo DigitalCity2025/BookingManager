@@ -12,10 +12,20 @@ namespace BookingManager.DAL
         public DbSet<Option> Options { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public HotelContext()
         {
-            optionsBuilder.UseSqlServer("server=K-LAPTOP;database=hotel.db;integrated security=true;trustServerCertificate=true");
+            
         }
+
+        public HotelContext(DbContextOptions options):base(options)
+        {
+
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("server=K-LAPTOP;database=hotel.db;integrated security=true;trustServerCertificate=true");
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
