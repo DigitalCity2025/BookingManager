@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Transactions;
 
 namespace BookingManager.MVC.Controllers
 {
@@ -30,45 +31,44 @@ namespace BookingManager.MVC.Controllers
 
         [HttpPost]
         public IActionResult Create(CustomerCreateFormViewModel form) 
-        { 
+        {
             // verifier si le formulaire est invalide
-            if(!ModelState.IsValid)
-            // oui 
+            try
             {
-                // revenir sur le formulaire
+                if (!ModelState.IsValid)
+                // oui 
+                {
+                    // revenir sur le formulaire
+                    return View(form);
+                }
+                // verifier que l'email est unique
+                Customer? cu = repository.GetByEmail(form.Email);
+                if (cu != null)
+                {
+                    ModelState.AddModelError(nameof(form.Email), "L'email existe déjà");
+                    return View(form);
+                }
+
+
+                // non
+                // traiter les données
+                // mapper les données dans une entité
+                Customer c = new Customer
+                {
+                    LastName = form.LastName,
+                    FirstName = form.FirstName,
+                    Email = form.Email,
+                    PhoneNumber = form.PhoneNumber,
+                };
+                
+                TempData["success"] = "Enreistrement OK";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = ex.Message;
                 return View(form);
             }
-            // non
-            // traiter les données
-            // mapper les données dans une entité
-            Customer c = new Customer
-            {
-                LastName = form.LastName,
-                FirstName = form.FirstName,
-                Email = form.Email,
-                PhoneNumber = form.PhoneNumber,
-            };
-            // créer un username
-            string prefix = (form.LastName[..2] + form.FirstName[..2]).ToUpper();
-            int count = repository.CountByUsername(prefix);
-            c.Username = prefix + count.ToString().PadLeft(4, '0');
-            // créer un password
-            string pwd = Guid.NewGuid().ToString().Replace("-", "")[..10];
-            byte[] hashedPwd = SHA512.HashData(Encoding.UTF8.GetBytes(pwd + form.Email));
-            c.Password = hashedPwd;
-            // sauver dans la db
-            repository.Add(c);
-            // envoyer un email
-            MailMessage mail = new MailMessage
-            {
-                Subject = "Merci pour votre inscription",
-                Body = $"Votre mot de passe : {pwd}",
-                From = new MailAddress("noreply@test.com"),
-            };
-            mail.To.Add(new MailAddress(form.Email));
-            smtpClient.Send(mail);
-            // revenir sur autre page
-            return RedirectToAction("Index");
         }
     }
 }

@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - BookingManager.MVC</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <link rel="stylesheet" href="~/BookingManager.MVC.styles.css" asp-append-version="true" />
 </head>
 <body>
@@ -14,6 +15,13 @@
 
     <div class="container">
         <main role="main" class="pb-3">
+            @* @if(TempData.ContainsKey("error")) {
+                <p class="text-danger">@TempData["error"]</p>
+            }
+            @if (TempData.ContainsKey("success"))
+            {
+                <p class="text-success">@TempData["success"]</p>
+            } *@
             @RenderBody()
         </main>
     </div>
@@ -23,6 +31,19 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if(TempData.ContainsKey("success")) {
+        <script>
+            toastr.success("@TempData["success"]");
+        </script>
+    }
+    @if (TempData.ContainsKey("error"))
+    {
+        <script>
+            toastr.error("@TempData["error"]");
+        </script>
+    }
 </body>
 </html>
