@@ -68,5 +68,25 @@ namespace BookingManager.Application.Services
             smtpClient.Send(mail);
         }
 
+        public void Delete(int id)
+        {
+            Customer? c = repository.GetById(id);
+            if(c == null)
+            {
+                throw new KeyNotFoundException("le client n'existe pas");
+            }
+            else
+            {
+                c.Deleted = true;
+                c.PhoneNumber = null;
+                repository.Update(c);
+            }
+        }
+
+        public IEnumerable<Customer> FindByKeyword(string? search)
+        {
+            return repository.FindByKeyword(search)
+                .Where(c => !c.Deleted);
+        }
     }
 }

@@ -14,13 +14,13 @@ using System.Transactions;
 
 namespace BookingManager.MVC.Controllers
 {
-    public class CustomerController(ICustomerRepository repository, ICustomerService customerService) : Controller
+    public class CustomerController(ICustomerService customerService) : Controller
     {
         public IActionResult Index([FromQuery]CustomerSearchFormViewModel model)
         {
             if(ModelState.IsValid)
             {
-                model.Results = repository.FindByKeyword(model.Search)
+                model.Results = customerService.FindByKeyword(model.Search)
                     .Select(ToViewModelMappers.ToCustomerIndex).ToList();
             }
             return View(model);
@@ -65,6 +65,19 @@ namespace BookingManager.MVC.Controllers
             TempData["success"] = "Enregistrement OK";
             return RedirectToAction("Index");
             
+        }
+
+        public IActionResult Delete([FromRoute]int id)
+        {
+            try
+            {
+                customerService.Delete(id);
+                return RedirectToAction("Index");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }

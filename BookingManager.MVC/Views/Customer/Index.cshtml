@@ -57,10 +57,29 @@
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                <a asp-controller="Customer" 
+                   asp-action="Delete" 
+                   asp-route-id="@item.Id" class="deleteLink">X</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+}
+
+@section Scripts {
+<script>
+    const deleteLinks = document.querySelectorAll('.deleteLink');
+    for(let link of deleteLinks) {
+        link.addEventListener('click', e =>{
+            // annuler le comportement pas défaut
+            e.preventDefault();
+            xdialog.confirm('Confirmer la suppression', () => {
+                // recupérer le lien sur lequel on a cliqué
+                let l = e.target;
+                window.location.href = l.href;
+            });
+        })
+    }
+</script>
 }
