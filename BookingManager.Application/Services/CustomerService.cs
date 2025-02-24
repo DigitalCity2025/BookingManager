@@ -88,5 +88,42 @@ namespace BookingManager.Application.Services
             return repository.FindByKeyword(search)
                 .Where(c => !c.Deleted);
         }
+
+        public Customer? GetById(int id)
+        {
+            Customer? customer = repository.GetById(id);
+            if (customer is not null && customer.Deleted)
+            {
+                return null;
+            }
+            return customer;
+        }
+
+        public void Update(int id, string lastName, string firstName, string? password, string? phoneNumber)
+        {
+            Customer? customer = repository.GetById(id);
+            if(customer == null)
+            {
+                throw new KeyNotFoundException();
+            }
+            customer.LastName = lastName;
+            customer.FirstName = firstName;
+            customer.PhoneNumber = phoneNumber;
+
+            if(password != null)
+            {
+                byte[] hash = HashPassword(password, customer.Email);
+                // if(hash.SequenceEqual(customer.Password))
+                if(Encoding.UTF8.GetString(hash) == Encoding.UTF8.GetString(customer.Password))
+                {
+                    throw new DuplicateFieldException(
+                        nameof(customer.Password), 
+                        "Le mot de passe doit être différent"
+                    );
+                }
+                customer.Password = hash;
+            }
+            repository.Update(customer);
+        }
     }
 }

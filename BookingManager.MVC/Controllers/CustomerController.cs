@@ -1,16 +1,10 @@
 ﻿using BookingManager.Application.Abstractions.Business;
-using BookingManager.Application.Abstractions.Repositories;
 using BookingManager.Application.Exceptions;
 using BookingManager.DAL.Entities;
-using BookingManager.DAL.Repositories;
 using BookingManager.MVC.Mappers;
 using BookingManager.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Net.Mail;
-using System.Security.Cryptography;
-using System.Text;
-using System.Transactions;
 
 namespace BookingManager.MVC.Controllers
 {
@@ -40,32 +34,66 @@ namespace BookingManager.MVC.Controllers
                 // revenir sur le formulaire
                 return View();
             }
-            // mapper les données dans une entité
-            Customer c = new Customer
-            {
-                LastName = form.LastName,
-                FirstName = form.FirstName,
-                Email = form.Email,
-                PhoneNumber = form.PhoneNumber,
-            };
             try
             {
+                // mapper les données dans une entité
+                Customer c = form.ToEntity();
+                // demander au service de créer un client
                 customerService.Create(c);
+            }
+            catch(DuplicateFieldException ex)
+            {
+                // ajouter une erreur dans le model State
+                ModelState.AddModelError(ex.FieldName, ex.Message);
+                return View();
+            }
+            catch(SmtpException)
+            {
+                //ajouter un message d'erreur temporaire
+                TempData["error"] = "L'email n'a pas pu être envoyé";
+                return View();
+            }
+            //ajouter un message de success temporaire
+            TempData["success"] = "Enregistrement OK";
+            return RedirectToAction("Index");
+            
+        }
+
+        public IActionResult Update([FromRoute] int id)
+        {
+            Customer? customer = customerService.GetById(id);
+            if(customer is null)
+            {
+                return NotFound();
+            }
+            CustomerEditFormViewModel model = customer.ToCustomerEditForm();
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Update([FromRoute]int id, [FromForm]CustomerEditFormViewModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View();
+            }
+            try
+            {
+                customerService.Update(id, model.LastName, model.FirstName, model.Password, model.PhoneNumber);
+                TempData["success"] = "OK";
+                return RedirectToAction("Index");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
             catch(DuplicateFieldException ex)
             {
                 ModelState.AddModelError(ex.FieldName, ex.Message);
                 return View();
             }
-            catch(SmtpException)
-            {
-                TempData["error"] = "L'email n'a pas pu être envoyé";
-                return View();
-            }
-            TempData["success"] = "Enregistrement OK";
-            return RedirectToAction("Index");
-            
         }
+
 
         public IActionResult Delete([FromRoute]int id)
         {

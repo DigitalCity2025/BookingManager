@@ -8,5 +8,7 @@ namespace BookingManager.Application.Abstractions.Business
 
         public void Delete(int id);
         IEnumerable<Customer> FindByKeyword(string? search);
+        Customer? GetById(int id);
+        void Update(int id, string lastName, string firstName, string? password, string? phoneNumber);
     }
 }

@@ -55,8 +55,7 @@
                 @Html.DisplayFor(modelItem => item.BookingsNb)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Editer", "Update", new { Id = item.Id }) |
                 <a asp-controller="Customer" 
                    asp-action="Delete" 
                    asp-route-id="@item.Id" class="deleteLink">X</a>

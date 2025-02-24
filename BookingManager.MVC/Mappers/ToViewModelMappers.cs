@@ -16,5 +16,15 @@ namespace BookingManager.MVC.Mappers
                 entity.Bookings.Count()
             );
         }
+
+        public static CustomerEditFormViewModel ToCustomerEditForm(this Customer entity)
+        {
+            return new CustomerEditFormViewModel
+            {
+                LastName = entity.LastName,
+                FirstName = entity.FirstName,
+                PhoneNumber = entity.PhoneNumber,
+            };
+        }
     }
 }
