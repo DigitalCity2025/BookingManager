@@ -6,8 +6,16 @@
         ("Test", "Hello", "Hello", null),
         ("Test", "Pause", "Heure de la pause", 15),
         ("Test", "Contact", "Contactez nous", null),
-        ("Customer", "Index", "Voir les clients", null)
+        ("Customer", "Index", "Voir les clients", null),
+        // ("Customer", "Login", "Se Connecter", null)
     ];
+
+    if(Context.Session.GetInt32("ID") == null) {
+        menuItems = [.. menuItems, ("Customer", "Login", "Se Connecter", null)];
+    } else {
+        menuItems = [.. menuItems, ("Customer", "Logout", "Se déconnecter", null)];
+    }
+
     RouteData route = Context.GetRouteData();
 }
 

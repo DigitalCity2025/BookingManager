@@ -4,6 +4,7 @@ using BookingManager.Application.Exceptions;
 using BookingManager.DAL.Entities;
 using System.Data;
 using System.Net.Mail;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using System.Transactions;
@@ -124,6 +125,16 @@ namespace BookingManager.Application.Services
                 customer.Password = hash;
             }
             repository.Update(customer);
+        }
+
+        public Customer Login(string usernameOrEmail, string password)
+        {
+            Customer? customer = repository.FindOneByUsernameOrEmail(usernameOrEmail);
+            if(customer == null || !customer.Password.SequenceEqual(HashPassword(password, customer.Email)))
+            {
+                throw new AuthenticationException();
+            }
+            return customer;
         }
     }
 }

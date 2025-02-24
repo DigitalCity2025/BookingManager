@@ -41,5 +41,10 @@ namespace BookingManager.DAL.Repositories
         {
             return ctx.Customers.Count(c => c.Username.StartsWith(prefix));
         }
+
+        public Customer? FindOneByUsernameOrEmail(string usernameOrEmail)
+        {
+            return ctx.Customers.SingleOrDefault(c => c.Username == usernameOrEmail || c.Email == usernameOrEmail);
+        }
     }
 }

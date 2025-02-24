@@ -13,5 +13,6 @@ namespace BookingManager.Application.Abstractions.Repositories
         List<Customer> GetByYear(int year);
         Customer? GetByEmail(string email);
         int CountByUsername(string prefix);
+        Customer? FindOneByUsernameOrEmail(string usernameOrEmail);
     }
 }
